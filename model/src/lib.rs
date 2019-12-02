@@ -1,6 +1,6 @@
 pub mod board;
-mod classification;
-mod color;
+pub mod classification;
+pub mod color;
 mod piece;
 
 use board::letter_to_row_index;
@@ -26,8 +26,8 @@ pub fn get_board() -> Board {
     state = add_piece(state, 'A', 1, Classification::ROOK, Color::WHITE);
     state = add_piece(state, 'B', 1, Classification::KNIGHT, Color::WHITE);
     state = add_piece(state, 'C', 1, Classification::BISHOP, Color::WHITE);
-    state = add_piece(state, 'D', 1, Classification::KING, Color::WHITE);
-    state = add_piece(state, 'E', 1, Classification::QUEEN, Color::WHITE);
+    state = add_piece(state, 'D', 1, Classification::QUEEN, Color::WHITE);
+    state = add_piece(state, 'E', 1, Classification::KING, Color::WHITE);
     state = add_piece(state, 'F', 1, Classification::BISHOP, Color::WHITE);
     state = add_piece(state, 'G', 1, Classification::KNIGHT, Color::WHITE);
     state = add_piece(state, 'H', 1, Classification::ROOK, Color::WHITE);
@@ -44,8 +44,8 @@ pub fn get_board() -> Board {
     state = add_piece(state, 'A', 8, Classification::ROOK, Color::BLACK);
     state = add_piece(state, 'B', 8, Classification::KNIGHT, Color::BLACK);
     state = add_piece(state, 'C', 8, Classification::BISHOP, Color::BLACK);
-    state = add_piece(state, 'D', 8, Classification::QUEEN, Color::BLACK);
-    state = add_piece(state, 'E', 8, Classification::KING, Color::BLACK);
+    state = add_piece(state, 'D', 8, Classification::KING, Color::BLACK);
+    state = add_piece(state, 'E', 8, Classification::QUEEN, Color::BLACK);
     state = add_piece(state, 'F', 8, Classification::BISHOP, Color::BLACK);
     state = add_piece(state, 'G', 8, Classification::KNIGHT, Color::BLACK);
     state = add_piece(state, 'H', 8, Classification::ROOK, Color::BLACK);

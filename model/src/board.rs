@@ -3,9 +3,24 @@ use std::collections::HashMap;
 use crate::piece::Piece;
 use std::string::String;
 
+#[derive(Clone)]
 pub struct Board {
     pub size: (u32, u32),
     pub state: HashMap<(u32, u32), Piece>,
+}
+
+impl Board {
+    pub fn remove(&mut self, origin: &(u32, u32)) {
+        self.state.remove(origin);
+    }
+
+    pub fn insert(&mut self, destination: (u32, u32), piece: Piece) {
+        self.state.insert(destination, piece);
+    }
+
+    pub fn get(&self, origin: &(u32, u32)) -> std::option::Option<&Piece> {
+        return self.state.get(origin);
+    }
 }
 
 pub fn row_index_to_letter(row_index: u32) -> String {

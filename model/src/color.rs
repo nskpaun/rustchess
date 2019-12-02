@@ -4,7 +4,7 @@ extern crate strum_macros;
 
 use strum_macros::{Display};
 
-#[derive(Display, Debug)]
+#[derive(Display, Debug, Clone, PartialEq)]
 pub enum Color {
     WHITE,
     BLACK
