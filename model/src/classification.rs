@@ -6,5 +6,10 @@ use strum_macros::{Display};
 
 #[derive(Display, Debug)]
 pub enum Classification {
+    PAWN,
+    ROOK,
+    KNIGHT,
+    BISHOP,
+    QUEEN,
     KING,
 }
