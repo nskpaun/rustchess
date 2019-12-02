@@ -8,7 +8,7 @@ use model::color::Color;
 use std::string::String;
 
 pub fn execute_move(
-    color: Color,
+    color: &Color,
     instruction: String,
     mut board: Board,
 ) -> Result<Board, ChessMoveError> {
@@ -19,7 +19,7 @@ pub fn execute_move(
             board: board.clone(),
         }),
     }?;
-    let origin = find_piece(color, chess_move.piece, &board)?.clone();
+    let origin = find_piece(color.clone(), chess_move.piece, &board)?.clone();
     let destination = chess_move.destination;
 
     if destination.0 > board.size.0 - 1 || destination.1 > board.size.1 - 1 {
