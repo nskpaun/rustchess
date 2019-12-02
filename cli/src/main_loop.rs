@@ -2,6 +2,7 @@ use std::io;
 
 extern crate model;
 
+use model::board::row_index_to_letter;
 use model::board::Board;
 
 pub fn execute_main_loop() {
@@ -22,6 +23,12 @@ pub fn execute_main_loop() {
 
 fn print_board_state(board: Board) {
     for (k, v) in board.state.iter() {
-        println!("\n{:?}: {:?} {:?}", k, v.color, v.classification);
+        println!(
+            "\n{:?}{:?}: {:?} {:?}",
+            row_index_to_letter(k.0),
+            k.1 + 1,
+            v.color,
+            v.classification
+        );
     }
 }
