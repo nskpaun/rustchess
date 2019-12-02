@@ -10,7 +10,8 @@ pub fn execute_main_loop() {
 
     let board = model::get_board();
 
-    println!("Current board state: {:?}", print_board_state(board));
+    println!("Current board state:");
+    print_board_state(board);
 
     io::stdin()
         .read_line(&mut guess)
