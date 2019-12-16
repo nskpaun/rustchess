@@ -44,6 +44,8 @@ pub fn parse_move(
 
     let possible_origins = find_piece(color.clone(), piece.clone(), &board, origin_column)?.clone();
 
+    let mut error_details = String::from("Could not find piece on board");
+
     for origin in possible_origins.iter() {
         let row = instruction_parts[instruction_parts.len() - 1]
             .parse::<i32>()
@@ -56,14 +58,15 @@ pub fn parse_move(
         };
         match validate_chess_move(&chess_move, board, color) {
             Ok(_) => return Ok(chess_move),
-            Err(_) => {
+            Err(err) => {
+                error_details = err.details;
                 continue;
             }
         }
     }
 
     return Err(ChessParseError {
-        details: String::from("Could not find piece on board"),
+        details: error_details,
     });
 }
 

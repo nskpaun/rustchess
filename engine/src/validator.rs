@@ -81,7 +81,17 @@ fn validate_move_is_legal_for_piece(
                 board: board.clone(),
             });
         }
-        Classification::KNIGHT => Ok(()),
+        Classification::KNIGHT => {
+            let column_diff = (chess_move.origin.0 - chess_move.destination.0).abs();
+            let row_diff = (chess_move.origin.1 - chess_move.destination.1).abs();
+            if row_diff + column_diff == 3 && row_diff > 0 && column_diff > 0 {
+                return Ok(());
+            }
+            return Err(ChessMoveError {
+                details: String::from("Illegal knight move"),
+                board: board.clone(),
+            });
+        }
         Classification::BISHOP => Ok(()),
         Classification::KING => Ok(()),
         Classification::QUEEN => Ok(()),
