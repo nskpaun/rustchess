@@ -66,7 +66,21 @@ fn validate_move_is_legal_for_piece(
                 board: board.clone(),
             });
         }
-        Classification::ROOK => Ok(()),
+        Classification::ROOK => {
+            let is_valid_horizonatal_move = chess_move.origin.0 != chess_move.destination.0
+                && chess_move.origin.1 == chess_move.destination.1;
+            let is_valid_vertical_move = chess_move.origin.0 == chess_move.destination.0
+                && chess_move.origin.1 != chess_move.destination.1;
+
+            if is_valid_horizonatal_move || is_valid_vertical_move {
+                return Ok(());
+            }
+
+            return Err(ChessMoveError {
+                details: String::from("Illegal rook move"),
+                board: board.clone(),
+            });
+        }
         Classification::KNIGHT => Ok(()),
         Classification::BISHOP => Ok(()),
         Classification::KING => Ok(()),
