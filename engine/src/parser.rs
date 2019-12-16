@@ -19,13 +19,27 @@ pub fn parse_move(
 ) -> Result<ChessMove, ChessParseError> {
     let instruction_parts: Vec<&str> = instruction.split_whitespace().collect();
 
-    let piece = Classification::from_str(instruction_parts[0])?;
+    let piece;
+    let column;
+    let origin_column;
+    if instruction_parts.len() == 2 {
+        piece = Classification::PAWN;
+        let column_chars: Vec<char> = instruction_parts[0].chars().collect();
+        column = letter_to_row_index(column_chars[0]);
+        origin_column = column;
+    } else {
+        piece = Classification::from_str(instruction_parts[0])?;
+        let column_chars: Vec<char> = instruction_parts[1].chars().collect();
+        column = letter_to_row_index(column_chars[0]);
+        origin_column = 9999;
+    }
 
-    let origin = find_piece(color.clone(), piece.clone(), &board)?.clone();
+    let origin = find_piece(color.clone(), piece.clone(), &board, origin_column)?.clone();
 
-    let column_chars: Vec<char> = instruction_parts[1].chars().collect();
-    let column = letter_to_row_index(column_chars[0]);
-    let row = instruction_parts[2].parse::<u32>().unwrap() - 1;
+    let row = instruction_parts[instruction_parts.len() - 1]
+        .parse::<u32>()
+        .unwrap()
+        - 1;
 
     return Ok(ChessMove {
         piece: piece,
@@ -38,9 +52,11 @@ fn find_piece(
     color: Color,
     classification: Classification,
     board: &Board,
+    origin_column: u32,
 ) -> Result<(&(u32, u32)), ChessParseError> {
     for (k, v) in board.state.iter() {
-        if v.classification == classification && v.color == color {
+        let is_correct_column = origin_column > board.size.0 || origin_column == k.0;
+        if v.classification == classification && v.color == color && is_correct_column {
             return Ok(k);
         }
     }
