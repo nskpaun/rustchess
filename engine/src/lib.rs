@@ -23,7 +23,7 @@ pub fn execute_move(
     }?;
     let destination = chess_move.destination;
 
-    validate_chess_move(&chess_move, &board)?;
+    validate_chess_move(&chess_move, &board, color)?;
 
     let piece = match board.get(&chess_move.origin) {
         Some(piece_res) => Ok(piece_res),
