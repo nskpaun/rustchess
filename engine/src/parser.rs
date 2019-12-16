@@ -27,6 +27,12 @@ pub fn parse_move(
         let column_chars: Vec<char> = instruction_parts[0].chars().collect();
         column = letter_to_row_index(column_chars[0]);
         origin_column = column;
+    } else if instruction_parts.len() == 4 {
+        piece = Classification::from_str(instruction_parts[0])?;
+        let origin_column_chars: Vec<char> = instruction_parts[1].chars().collect();
+        origin_column = letter_to_row_index(origin_column_chars[0]);
+        let column_chars: Vec<char> = instruction_parts[2].chars().collect();
+        column = letter_to_row_index(column_chars[0]);
     } else {
         piece = Classification::from_str(instruction_parts[0])?;
         let column_chars: Vec<char> = instruction_parts[1].chars().collect();

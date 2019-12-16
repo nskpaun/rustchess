@@ -40,6 +40,7 @@ fn validate_move_is_legal_for_piece(
             };
 
             if chess_move.origin.1 == initial_rank
+                && chess_move.origin.0 == chess_move.destination.0
                 && chess_move.destination.1 - chess_move.origin.1 == 2
                 && !is_capturing
             {
