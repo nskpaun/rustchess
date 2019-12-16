@@ -3,7 +3,7 @@ use std::io;
 extern crate engine;
 extern crate model;
 
-// use std::env;
+use std::env;
 use engine::execute_move;
 use engine::validator::ChessMoveError;
 use model::board::row_index_to_letter;
@@ -13,7 +13,7 @@ use model::color::Color;
 pub fn execute_main_loop() {
     println!("Welcome to chess in Rust!");
     // Uncomment for debugging.
-    // env::set_var("RUST_BACKTRACE", "1");
+    env::set_var("RUST_BACKTRACE", "1");
 
     let mut board: Board = model::get_board();
     let mut current_color = Color::WHITE;

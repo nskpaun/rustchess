@@ -21,13 +21,19 @@ fn validate_move_is_legal_for_piece(
 ) -> Result<(), ChessMoveError> {
     return match chess_move.piece {
         Classification::PAWN => {
+            // only allow moving 2 spaces if on 2nd or 7th rank
+            let move_direction = match color {
+                Color::WHITE => 1,
+                Color::BLACK => -1,
+            };
             let is_capturing = match board.get(&chess_move.destination) {
                 Some(piece_res) => piece_res.color != *color,
                 None => false,
             };
+
             // only allowed to move forward one square
             if chess_move.origin.0 == chess_move.destination.0
-                && chess_move.destination.1 - chess_move.origin.1 == 1
+                && chess_move.destination.1 - chess_move.origin.1 == move_direction
                 && !is_capturing
             {
                 return Ok(());
@@ -35,13 +41,13 @@ fn validate_move_is_legal_for_piece(
 
             // only allow moving 2 spaces if on 2nd or 7th rank
             let initial_rank = match color {
-                Color::WHITE => 2,
-                Color::BLACK => 7,
+                Color::WHITE => 1,
+                Color::BLACK => 6,
             };
 
             if chess_move.origin.1 == initial_rank
                 && chess_move.origin.0 == chess_move.destination.0
-                && chess_move.destination.1 - chess_move.origin.1 == 2
+                && chess_move.destination.1 - chess_move.origin.1 == 2 * move_direction
                 && !is_capturing
             {
                 return Ok(());
@@ -49,8 +55,8 @@ fn validate_move_is_legal_for_piece(
 
             // allow capturing diagonally forward
             if is_capturing
-                && chess_move.destination.1 - chess_move.origin.1 == 1
-                && chess_move.destination.0 - chess_move.origin.0 == 1
+                && chess_move.destination.1 - chess_move.origin.1 == move_direction
+                && chess_move.destination.0 - chess_move.origin.0 == move_direction
             {
                 return Ok(());
             }

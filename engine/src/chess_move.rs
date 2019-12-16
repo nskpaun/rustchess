@@ -2,6 +2,6 @@ use model::classification::Classification;
 
 pub struct ChessMove {
     pub piece: Classification,
-    pub destination: (u32, u32),
-    pub origin: (u32, u32)
+    pub destination: (i32, i32),
+    pub origin: (i32, i32)
 }

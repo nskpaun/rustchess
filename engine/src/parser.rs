@@ -43,7 +43,7 @@ pub fn parse_move(
     let origin = find_piece(color.clone(), piece.clone(), &board, origin_column)?.clone();
 
     let row = instruction_parts[instruction_parts.len() - 1]
-        .parse::<u32>()
+        .parse::<i32>()
         .unwrap()
         - 1;
 
@@ -58,8 +58,8 @@ fn find_piece(
     color: Color,
     classification: Classification,
     board: &Board,
-    origin_column: u32,
-) -> Result<(&(u32, u32)), ChessParseError> {
+    origin_column: i32,
+) -> Result<(&(i32, i32)), ChessParseError> {
     for (k, v) in board.state.iter() {
         let is_correct_column = origin_column > board.size.0 || origin_column == k.0;
         if v.classification == classification && v.color == color && is_correct_column {

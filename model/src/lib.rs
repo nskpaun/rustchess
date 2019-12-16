@@ -12,7 +12,7 @@ use piece::Piece;
 use std::collections::HashMap;
 
 pub fn get_board() -> Board {
-    let mut state: HashMap<(u32, u32), Piece> = HashMap::new();
+    let mut state: HashMap<(i32, i32), Piece> = HashMap::new();
 
     state = add_piece(state, 'A', 2, Classification::PAWN, Color::WHITE);
     state = add_piece(state, 'B', 2, Classification::PAWN, Color::WHITE);
@@ -58,12 +58,12 @@ pub fn get_board() -> Board {
 }
 
 fn add_piece(
-    mut state: HashMap<(u32, u32), Piece>,
+    mut state: HashMap<(i32, i32), Piece>,
     column: char,
-    row: u32,
+    row: i32,
     classification: Classification,
     color: Color,
-) -> HashMap<(u32, u32), Piece> {
+) -> HashMap<(i32, i32), Piece> {
     state.insert(
         (letter_to_row_index(column), row - 1),
         Piece {
