@@ -1,6 +1,7 @@
 extern crate strum;
 
 use crate::chess_move;
+use crate::validator::validate_chess_move;
 
 use chess_move::ChessMove;
 use model::board::letter_to_row_index;
@@ -8,6 +9,7 @@ use model::board::Board;
 use model::classification::Classification;
 use model::color::Color;
 use std::string::String;
+use std::vec::Vec;
 use strum::ParseError;
 
 use std::str::FromStr;
@@ -40,17 +42,28 @@ pub fn parse_move(
         origin_column = 9999;
     }
 
-    let origin = find_piece(color.clone(), piece.clone(), &board, origin_column)?.clone();
+    let possible_origins = find_piece(color.clone(), piece.clone(), &board, origin_column)?.clone();
 
-    let row = instruction_parts[instruction_parts.len() - 1]
-        .parse::<i32>()
-        .unwrap()
-        - 1;
+    for origin in possible_origins.iter() {
+        let row = instruction_parts[instruction_parts.len() - 1]
+            .parse::<i32>()
+            .unwrap()
+            - 1;
+        let chess_move = ChessMove {
+            piece: piece.clone(),
+            destination: (column, row),
+            origin: **origin,
+        };
+        match validate_chess_move(&chess_move, board, color) {
+            Ok(_) => return Ok(chess_move),
+            Err(_) => {
+                continue;
+            }
+        }
+    }
 
-    return Ok(ChessMove {
-        piece: piece,
-        destination: (column, row),
-        origin: origin,
+    return Err(ChessParseError {
+        details: String::from("Could not find piece on board"),
     });
 }
 
@@ -59,16 +72,20 @@ fn find_piece(
     classification: Classification,
     board: &Board,
     origin_column: i32,
-) -> Result<(&(i32, i32)), ChessParseError> {
+) -> Result<(Vec<&(i32, i32)>), ChessParseError> {
+    let mut pieces = Vec::<&(i32, i32)>::with_capacity(8);
     for (k, v) in board.state.iter() {
         let is_correct_column = origin_column > board.size.0 || origin_column == k.0;
         if v.classification == classification && v.color == color && is_correct_column {
-            return Ok(k);
+            pieces.push(k);
         }
     }
-    return Err(ChessParseError {
-        details: String::from("Could not find piece on board"),
-    });
+    if pieces.is_empty() {
+        return Err(ChessParseError {
+            details: String::from("Could not find piece on board"),
+        });
+    }
+    return Ok(pieces);
 }
 
 #[derive(Debug)]
