@@ -11,7 +11,75 @@ pub fn validate_chess_move(
 ) -> Result<(), ChessMoveError> {
     validate_move_is_on_board(chess_move, board)?;
     validate_move_is_legal_for_piece(chess_move, board, color)?;
+    validate_path_is_clear(chess_move, board, color)?;
     return Ok(());
+}
+
+fn validate_path_is_clear(
+    chess_move: &ChessMove,
+    board: &Board,
+    color: &Color,
+) -> Result<(), ChessMoveError> {
+    let is_destination_occupied = match board.get(&chess_move.destination) {
+        Some(piece_res) => piece_res.color == *color,
+        None => false,
+    };
+
+    if is_destination_occupied {
+        return Err(ChessMoveError {
+            details: String::from("Destination square is occupied"),
+            board: board.clone(),
+        });
+    }
+
+    match chess_move.piece {
+        Classification::KING | Classification::KNIGHT => Ok(()),
+        Classification::ROOK => {
+            let is_vertical_move = chess_move.origin.0 == chess_move.destination.0;
+            if is_vertical_move {
+                for row_check in chess_move.origin.1..chess_move.destination.1 {
+                    let current_check = (chess_move.origin.0, row_check);
+                    if current_check == chess_move.origin || current_check == chess_move.destination
+                    {
+                        continue;
+                    }
+                    let is_current_check_occupied = match board.get(&current_check) {
+                        Some(_) => true,
+                        None => false,
+                    };
+                    if is_current_check_occupied {
+                        return Err(ChessMoveError {
+                            details: String::from("Rook move illegal, blocked by piece"),
+                            board: board.clone(),
+                        });
+                    }
+                }
+            } else {
+                for column_check in chess_move.origin.0..chess_move.destination.0 {
+                    let current_check = (chess_move.origin.1, column_check);
+                    if current_check == chess_move.origin || current_check == chess_move.destination
+                    {
+                        continue;
+                    }
+                    let is_current_check_occupied = match board.get(&current_check) {
+                        Some(_) => true,
+                        None => false,
+                    };
+                    if is_current_check_occupied {
+                        return Err(ChessMoveError {
+                            details: String::from("Rook move illegal, blocked by piece"),
+                            board: board.clone(),
+                        });
+                    }
+                }
+            }
+
+            return Ok(());
+        }
+        Classification::BISHOP => Ok(()),
+        Classification::QUEEN => Ok(()),
+        Classification::PAWN => Ok(()),
+    }
 }
 
 fn validate_move_is_legal_for_piece(
@@ -65,7 +133,7 @@ fn validate_move_is_legal_for_piece(
                 details: String::from("Illegal pawn move"),
                 board: board.clone(),
             });
-        },
+        }
         Classification::ROOK => {
             let is_valid_horizonatal_move = chess_move.origin.0 != chess_move.destination.0
                 && chess_move.origin.1 == chess_move.destination.1;
@@ -80,7 +148,7 @@ fn validate_move_is_legal_for_piece(
                 details: String::from("Illegal rook move"),
                 board: board.clone(),
             });
-        },
+        }
         Classification::KNIGHT => {
             let column_diff = (chess_move.origin.0 - chess_move.destination.0).abs();
             let row_diff = (chess_move.origin.1 - chess_move.destination.1).abs();
@@ -91,7 +159,7 @@ fn validate_move_is_legal_for_piece(
                 details: String::from("Illegal knight move"),
                 board: board.clone(),
             });
-        },
+        }
         Classification::BISHOP => {
             let column_diff = (chess_move.origin.0 - chess_move.destination.0).abs();
             let row_diff = (chess_move.origin.1 - chess_move.destination.1).abs();
@@ -102,7 +170,7 @@ fn validate_move_is_legal_for_piece(
                 details: String::from("Illegal bishop move"),
                 board: board.clone(),
             });
-        },
+        }
         Classification::KING => {
             let column_diff = (chess_move.origin.0 - chess_move.destination.0).abs();
             let row_diff = (chess_move.origin.1 - chess_move.destination.1).abs();
@@ -129,7 +197,7 @@ fn validate_move_is_legal_for_piece(
                 details: String::from("Illegal king move"),
                 board: board.clone(),
             });
-        },
+        }
         Classification::QUEEN => {
             let column_diff = (chess_move.origin.0 - chess_move.destination.0).abs();
             let row_diff = (chess_move.origin.1 - chess_move.destination.1).abs();
