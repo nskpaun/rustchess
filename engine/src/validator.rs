@@ -19,7 +19,7 @@ fn validate_move_is_legal_for_piece(
     board: &Board,
     color: &Color,
 ) -> Result<(), ChessMoveError> {
-    return match chess_move.piece {
+    match chess_move.piece {
         Classification::PAWN => {
             // only allow moving 2 spaces if on 2nd or 7th rank
             let move_direction = match color {
@@ -65,7 +65,7 @@ fn validate_move_is_legal_for_piece(
                 details: String::from("Illegal pawn move"),
                 board: board.clone(),
             });
-        }
+        },
         Classification::ROOK => {
             let is_valid_horizonatal_move = chess_move.origin.0 != chess_move.destination.0
                 && chess_move.origin.1 == chess_move.destination.1;
@@ -80,7 +80,7 @@ fn validate_move_is_legal_for_piece(
                 details: String::from("Illegal rook move"),
                 board: board.clone(),
             });
-        }
+        },
         Classification::KNIGHT => {
             let column_diff = (chess_move.origin.0 - chess_move.destination.0).abs();
             let row_diff = (chess_move.origin.1 - chess_move.destination.1).abs();
@@ -91,10 +91,66 @@ fn validate_move_is_legal_for_piece(
                 details: String::from("Illegal knight move"),
                 board: board.clone(),
             });
+        },
+        Classification::BISHOP => {
+            let column_diff = (chess_move.origin.0 - chess_move.destination.0).abs();
+            let row_diff = (chess_move.origin.1 - chess_move.destination.1).abs();
+            if column_diff == row_diff && row_diff > 0 && column_diff > 0 {
+                return Ok(());
+            }
+            return Err(ChessMoveError {
+                details: String::from("Illegal bishop move"),
+                board: board.clone(),
+            });
+        },
+        Classification::KING => {
+            let column_diff = (chess_move.origin.0 - chess_move.destination.0).abs();
+            let row_diff = (chess_move.origin.1 - chess_move.destination.1).abs();
+            if column_diff > 1 || row_diff > 1 {
+                return Err(ChessMoveError {
+                    details: String::from("Illegal king move"),
+                    board: board.clone(),
+                });
+            }
+            if column_diff == row_diff && row_diff > 0 && column_diff > 0 {
+                return Ok(());
+            }
+
+            let is_valid_horizonatal_move = chess_move.origin.0 != chess_move.destination.0
+                && chess_move.origin.1 == chess_move.destination.1;
+            let is_valid_vertical_move = chess_move.origin.0 == chess_move.destination.0
+                && chess_move.origin.1 != chess_move.destination.1;
+
+            if is_valid_horizonatal_move || is_valid_vertical_move {
+                return Ok(());
+            }
+
+            return Err(ChessMoveError {
+                details: String::from("Illegal king move"),
+                board: board.clone(),
+            });
+        },
+        Classification::QUEEN => {
+            let column_diff = (chess_move.origin.0 - chess_move.destination.0).abs();
+            let row_diff = (chess_move.origin.1 - chess_move.destination.1).abs();
+            if column_diff == row_diff && row_diff > 0 && column_diff > 0 {
+                return Ok(());
+            }
+
+            let is_valid_horizonatal_move = chess_move.origin.0 != chess_move.destination.0
+                && chess_move.origin.1 == chess_move.destination.1;
+            let is_valid_vertical_move = chess_move.origin.0 == chess_move.destination.0
+                && chess_move.origin.1 != chess_move.destination.1;
+
+            if is_valid_horizonatal_move || is_valid_vertical_move {
+                return Ok(());
+            }
+
+            return Err(ChessMoveError {
+                details: String::from("Illegal queen move"),
+                board: board.clone(),
+            });
         }
-        Classification::BISHOP => Ok(()),
-        Classification::KING => Ok(()),
-        Classification::QUEEN => Ok(()),
     };
 }
 
