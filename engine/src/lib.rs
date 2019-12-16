@@ -1,10 +1,13 @@
 extern crate model;
 mod chess_move;
 mod parser;
+pub mod validator;
 
 use model::board::Board;
 use model::color::Color;
 use std::string::String;
+use validator::ChessMoveError;
+use validator::validate_chess_move;
 
 pub fn execute_move(
     color: &Color,
@@ -20,12 +23,8 @@ pub fn execute_move(
     }?;
     let destination = chess_move.destination;
 
-    if destination.0 > board.size.0 - 1 || destination.1 > board.size.1 - 1 {
-        return Err(ChessMoveError {
-            details: String::from("Illegal index for move"),
-            board: board,
-        });
-    }
+    validate_chess_move(&chess_move, &board)?;
+
     let piece = match board.get(&chess_move.origin) {
         Some(piece_res) => Ok(piece_res),
         None => Err(ChessMoveError {
@@ -38,11 +37,6 @@ pub fn execute_move(
     board.remove(&chess_move.origin);
     board.insert(destination, piece);
     return Ok(board);
-}
-
-pub struct ChessMoveError {
-    pub details: String,
-    pub board: Board,
 }
 
 #[cfg(test)]

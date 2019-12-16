@@ -5,7 +5,7 @@ extern crate model;
 
 // use std::env;
 use engine::execute_move;
-use engine::ChessMoveError;
+use engine::validator::ChessMoveError;
 use model::board::row_index_to_letter;
 use model::board::Board;
 use model::color::Color;
