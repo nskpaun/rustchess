@@ -1,6 +1,7 @@
 use crate::chess_move::ChessMove;
 use model::classification::Classification;
 use model::color::Color;
+use std::vec::Vec;
 
 use model::board::Board;
 
@@ -35,51 +36,126 @@ fn validate_path_is_clear(
     match chess_move.piece {
         Classification::KING | Classification::KNIGHT => Ok(()),
         Classification::ROOK => {
-            let is_vertical_move = chess_move.origin.0 == chess_move.destination.0;
-            if is_vertical_move {
-                for row_check in chess_move.origin.1..chess_move.destination.1 {
-                    let current_check = (chess_move.origin.0, row_check);
-                    if current_check == chess_move.origin || current_check == chess_move.destination
-                    {
-                        continue;
-                    }
-                    let is_current_check_occupied = match board.get(&current_check) {
-                        Some(_) => true,
-                        None => false,
-                    };
-                    if is_current_check_occupied {
-                        return Err(ChessMoveError {
-                            details: String::from("Rook move illegal, blocked by piece"),
-                            board: board.clone(),
-                        });
-                    }
-                }
+            return validate_horizontal_or_vertical_path(
+                chess_move,
+                board,
+                String::from("Rook move illegal, blocked by piece"),
+            );
+        }
+        Classification::BISHOP => {
+            return validate_diagonal_path(
+                chess_move,
+                board,
+                String::from("Bishop move illegal, blocked by piece"),
+            );
+        }
+        Classification::QUEEN => {
+            let column_diff = (chess_move.origin.0 - chess_move.destination.0).abs();
+            let row_diff = (chess_move.origin.1 - chess_move.destination.1).abs();
+            if column_diff == row_diff {
+                validate_diagonal_path(
+                    chess_move,
+                    board,
+                    String::from("Queen move illegal, blocked by piece"),
+                )?;
             } else {
-                for column_check in chess_move.origin.0..chess_move.destination.0 {
-                    let current_check = (chess_move.origin.1, column_check);
-                    if current_check == chess_move.origin || current_check == chess_move.destination
-                    {
-                        continue;
-                    }
-                    let is_current_check_occupied = match board.get(&current_check) {
-                        Some(_) => true,
-                        None => false,
-                    };
-                    if is_current_check_occupied {
-                        return Err(ChessMoveError {
-                            details: String::from("Rook move illegal, blocked by piece"),
-                            board: board.clone(),
-                        });
-                    }
-                }
+                validate_horizontal_or_vertical_path(
+                    chess_move,
+                    board,
+                    String::from("Queen move illegal, blocked by piece"),
+                )?;
             }
 
             return Ok(());
         }
-        Classification::BISHOP => Ok(()),
-        Classification::QUEEN => Ok(()),
-        Classification::PAWN => Ok(()),
+        Classification::PAWN => {
+            let row_diff = chess_move.destination.1 - chess_move.origin.1;
+            let is_middle_occupied =
+                match board.get(&(chess_move.origin.0, chess_move.origin.1 + row_diff / 2)) {
+                    Some(piece_res) => piece_res.color == *color,
+                    None => false,
+                };
+            if row_diff.abs() == 2 && is_middle_occupied {
+                return Err(ChessMoveError {
+                    details: String::from("Pawn move illegal, blocked by piece"),
+                    board: board.clone(),
+                });
+            }
+
+            return Ok(());
+        }
     }
+}
+
+fn validate_diagonal_path(
+    chess_move: &ChessMove,
+    board: &Board,
+    error_message: String,
+) -> Result<(), ChessMoveError> {
+    let rows: Vec<i32> = (chess_move.origin.1..chess_move.destination.1).collect();
+    let columns: Vec<i32> = (chess_move.origin.0..chess_move.destination.0).collect();
+    for i in 0..rows.len() {
+        let current_check = (columns[i], rows[i]);
+        if current_check == chess_move.origin || current_check == chess_move.destination {
+            continue;
+        }
+        let is_current_check_occupied = match board.get(&current_check) {
+            Some(_) => true,
+            None => false,
+        };
+        if is_current_check_occupied {
+            return Err(ChessMoveError {
+                details: error_message,
+                board: board.clone(),
+            });
+        }
+    }
+    return Ok(());
+}
+
+fn validate_horizontal_or_vertical_path(
+    chess_move: &ChessMove,
+    board: &Board,
+    error_message: String,
+) -> Result<(), ChessMoveError> {
+    let is_vertical_move = chess_move.origin.0 == chess_move.destination.0;
+    if is_vertical_move {
+        for row_check in chess_move.origin.1..chess_move.destination.1 {
+            let current_check = (chess_move.origin.0, row_check);
+            if current_check == chess_move.origin || current_check == chess_move.destination {
+                continue;
+            }
+            let is_current_check_occupied = match board.get(&current_check) {
+                Some(_) => true,
+                None => false,
+            };
+            if is_current_check_occupied {
+                return Err(ChessMoveError {
+                    details: error_message,
+                    board: board.clone(),
+                });
+            }
+        }
+    } else {
+        for column_check in chess_move.origin.0..chess_move.destination.0 {
+            let current_check = (chess_move.origin.1, column_check);
+            if current_check == chess_move.origin || current_check == chess_move.destination {
+                continue;
+            }
+            let is_current_check_occupied = match board.get(&current_check) {
+                Some(_) => true,
+                None => false,
+            };
+            if is_current_check_occupied {
+                return Err(ChessMoveError {
+                    details: String::from("Rook move illegal, blocked by piece"),
+                    board: board.clone(),
+                });
+            }
+        }
+    }
+
+    return Ok(());
 }
 
 fn validate_move_is_legal_for_piece(
