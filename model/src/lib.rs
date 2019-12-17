@@ -44,8 +44,8 @@ pub fn get_board() -> Board {
     state = add_piece(state, 'A', 8, Classification::ROOK, Color::BLACK);
     state = add_piece(state, 'B', 8, Classification::KNIGHT, Color::BLACK);
     state = add_piece(state, 'C', 8, Classification::BISHOP, Color::BLACK);
-    state = add_piece(state, 'D', 8, Classification::KING, Color::BLACK);
-    state = add_piece(state, 'E', 8, Classification::QUEEN, Color::BLACK);
+    state = add_piece(state, 'D', 8, Classification::QUEEN, Color::BLACK);
+    state = add_piece(state, 'E', 8, Classification::KING, Color::BLACK);
     state = add_piece(state, 'F', 8, Classification::BISHOP, Color::BLACK);
     state = add_piece(state, 'G', 8, Classification::KNIGHT, Color::BLACK);
     state = add_piece(state, 'H', 8, Classification::ROOK, Color::BLACK);
